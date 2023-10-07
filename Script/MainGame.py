@@ -1,5 +1,9 @@
 import pygame
 import sys
+import CONST
+from LevelCtl import FactoryLevel
+from WaterPipe import Pipe, PipeManager
+import os
 
 # Khởi tạo Pygame
 pygame.init()
@@ -9,6 +13,13 @@ screen = pygame.display.set_mode((432, 768))
 pygame.display.set_caption("Flappy Bird")
 icon = pygame.image.load('assets/yellowbird-midflap.png')
 pygame.display.set_icon(icon)
+
+# Water pipe setup
+pipe_surface = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/pipe-green.png')).convert()
+pipe_manager = PipeManager(pipe_surface)
+spawnPipeEvent = pygame.USEREVENT
+pygame.time.set_timer(spawnPipeEvent, 1200)
+
 # Hình nền màn hình bắt đầu
 start_bg = pygame.transform.scale2x(pygame.image.load('assets/background-night.png').convert())
 
@@ -32,14 +43,17 @@ quit_button_rect = quit_button.get_rect(center=(216, 534))
 
 score = pygame.transform.scale(pygame.image.load('assets/text_score.png').convert_alpha(),(150,50))
 
+# Creat Level
+level = FactoryLevel.create_level(1, pipe_manager, 5)
+
+
 # Trạng thái game
-game_over = False
+game_over = True
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
     
-    global game_over
-    game_over = False
+
     
     global current_button
     current_button = "start"
@@ -53,8 +67,7 @@ def start_screen():
 def end_screen():
     screen.blit(end_bg, (0, 0))
     screen.blit(score,(100,150))
-    global game_over
-    game_over = True
+
 
     global current_button
     current_button = "end"
@@ -83,41 +96,47 @@ while True:
             pygame.quit()
             sys.exit()
     
-    if current_button_rect.collidepoint(pygame.mouse.get_pos()):
-        hovered = True
+    
+    
+    if game_over == False:
+        level.update(screen)
     else:
-        hovered = False
-    
-    if current_button == "start" and not game_over:
-        if hovered:
-            current_button_image = start_button_hover
+        #UI
+        if current_button_rect.collidepoint(pygame.mouse.get_pos()):
+            hovered = True
         else:
-            current_button_image = start_button
-    
-    if current_button == "end" and game_over:
-        if hovered:
-            current_button_image = new_game_button_hover
-        else:
-            current_button_image = new_game_button
+            hovered = False
+        
+        if current_button == "start" :
+            if hovered:
+                current_button_image = start_button_hover
+            else:
+                current_button_image = start_button
+        
+        if current_button == "end" :
+            if hovered:
+                current_button_image = new_game_button_hover
+            else:
+                current_button_image = new_game_button
 
-    if current_button == "end":
+        if current_button == "end":
+            if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
+                screen.blit(quit_button_hover, quit_button_rect)
+            else:
+                screen.blit(quit_button, quit_button_rect)
+        
         if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
-            screen.blit(quit_button_hover, quit_button_rect)
-        else:
-            screen.blit(quit_button, quit_button_rect)
-    
-    if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
-        if pygame.mouse.get_pressed()[0]:
-            pygame.quit()
-            sys.exit()
+            if pygame.mouse.get_pressed()[0]:
+                pygame.quit()
+                sys.exit()
 
-    screen.blit(current_button_image, current_button_rect)
-    
-    if hovered and pygame.mouse.get_pressed()[0]:
-        if current_button == "start":
-            end_screen()
-        elif current_button == "end":
-            start_screen()
+        screen.blit(current_button_image, current_button_rect)
+        
+        if hovered and pygame.mouse.get_pressed()[0]:
+            if current_button == "start":
+                game_over = False
+            elif current_button == "end":
+                start_screen()
 
-    
+        
     pygame.display.update()

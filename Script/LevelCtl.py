@@ -1,4 +1,4 @@
-from Script.WaterPipe import Pipe
+from WaterPipe import Pipe
 
 
 class FactoryLevel:
