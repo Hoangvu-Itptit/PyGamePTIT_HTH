@@ -98,6 +98,8 @@ while True:
     
     
     
+        if event.type == spawnPipeEvent:
+            pipe_manager.add_pipe()
     if game_over == False:
         level.update(screen)
     else:
