@@ -23,6 +23,8 @@ pygame.time.set_timer(spawnPipeEvent, 1200)
 # Hình nền màn hình bắt đầu
 start_bg = pygame.transform.scale2x(pygame.image.load('assets/background-night.png').convert())
 
+clock = pygame.time.Clock()
+
 # Hình nền màn hình kết thúc
 end_bg = pygame.image.load('assets/backgroundEmpty.png').convert()
 
@@ -47,8 +49,58 @@ score = pygame.transform.scale(pygame.image.load('assets/text_score.png').conver
 level = FactoryLevel.create_level(1, pipe_manager, 5)
 
 
-# Trạng thái game
+#Bird
+def move_bird(bird):
+    bird.centerx += direction
+    return bird
+def check_collision():
+    global direction
+    # for pipe in pipes:
+    #     if bird_rect.colliderect(pipe):
+    #         hit_sound.play()
+    #         return False
+    if bird_rect.left <= 0 or bird_rect.right >= 432:
+            direction *= -1
+    if bird_rect.top <= -75 or bird_rect.bottom >= 650:
+            return True    
+    return False 
+
+
+def rotate_bird(bird1):
+	new_bird = pygame.transform.rotozoom(bird1,-bird_movement*3,1)
+	return new_bird
+def bird_animation(bird):
+    new_bird = bird_list[bird_index]
+    new_bird_rect = new_bird.get_rect(center = (bird.centerx,bird_rect.centery))
+    global direction
+    new_bird = pygame.transform.flip(new_bird,False if direction < 0 else True,False)
+    return new_bird, new_bird_rect
+
+
+#Tạo các biến cho trò chơi
 game_over = True
+gravity = 0.25
+bird_movement = 0
+score = 0
+high_score = 0
+direction = 3
+floor_x_pos = 0
+
+#tạo chim
+bird_down = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-downflap.png').convert_alpha())
+bird_mid = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-midflap.png').convert_alpha())
+bird_up = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-upflap.png').convert_alpha())
+bird_list= [bird_down,bird_mid,bird_up] #0 1 2
+bird_index = 0
+bird = bird_list[bird_index]
+#bird= pygame.image.load('assets/yellowbird-midflap.png').convert_alpha()
+#bird = pygame.transform.scale2x(bird)
+bird_rect = bird.get_rect(center = (100,384))
+
+#tạo timer cho bird
+birdflap = pygame.USEREVENT + 1
+pygame.time.set_timer(birdflap,200)
+
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
@@ -89,19 +141,50 @@ start_screen()
 # Trạng thái hover của nút
 hovered = False
 
+
+#Chèn âm thanh
+flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
+hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
+score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
+
 # Vòng lặp xử lý game 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    
+        
     
     
         if event.type == spawnPipeEvent:
             pipe_manager.add_pipe()
+            
+            
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and game_over == False:
+                bird_movement = 0
+                bird_movement =-7
+                flap_sound.play()
+        
+        if event.type == birdflap:
+            if bird_index < 2:
+                bird_index += 1
+            else:
+                bird_index =0 
+            bird, bird_rect = bird_animation(bird_rect)    
+            
+            
     if game_over == False:
+        screen.blit(start_bg, (0, 0))
         level.update(screen)
+        
+        #chim
+        bird_movement += gravity
+        rotated_bird = rotate_bird(bird)       
+        bird_rect.centery += bird_movement
+        screen.blit(rotated_bird,bird_rect)
+        game_over= check_collision()
+        bird_rect.centerx -= direction
     else:
         #UI
         if current_button_rect.collidepoint(pygame.mouse.get_pos()):
@@ -136,9 +219,13 @@ while True:
         
         if hovered and pygame.mouse.get_pressed()[0]:
             if current_button == "start":
+                bird_rect = bird.get_rect(center = (100,384))
+                bird_movement = 0
                 game_over = False
+                
             elif current_button == "end":
                 start_screen()
 
         
     pygame.display.update()
+    clock.tick(60)
