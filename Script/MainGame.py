@@ -6,6 +6,7 @@ from WaterPipe import Pipe, PipeManager
 import os
 
 # Khởi tạo Pygame
+pygame.mixer.pre_init(frequency=44100,size=-16,channels=2,buffer=512)
 pygame.init()
 
 # Cửa sổ game
@@ -26,10 +27,16 @@ start_bg = pygame.transform.scale2x(pygame.image.load('assets/background-night.p
 # Hình nền màn hình kết thúc
 end_bg = pygame.image.load('assets/backgroundEmpty.png').convert()
 
+
 # Nút Start
 start_button = pygame.transform.scale(pygame.image.load('assets/startButton.png').convert_alpha(),(200,50))
 start_button_hover = pygame.transform.scale(pygame.image.load('assets/startColButton.png').convert_alpha(),(200,50))
-start_button_rect = start_button.get_rect(center=(216, 384))
+start_button_rect = start_button.get_rect(center=(216, 434))
+
+# Nút Start2
+play_button = pygame.transform.scale(pygame.image.load('assets/playButton.png').convert_alpha(),(200,50))
+play_button_hover = pygame.transform.scale(pygame.image.load('assets/playColButton.png').convert_alpha(),(200,50))
+play_button_rect = play_button.get_rect(center=(216, 534))
 
 # Nút New Game
 new_game_button = pygame.transform.scale(pygame.image.load('assets/newGameButton.png').convert_alpha(),(200,50))
@@ -52,7 +59,6 @@ game_over = True
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
-    
 
     
     global current_button
@@ -97,7 +103,6 @@ while True:
             sys.exit()
     
     
-    
         if event.type == spawnPipeEvent:
             pipe_manager.add_pipe()
     if game_over == False:
@@ -140,5 +145,5 @@ while True:
             elif current_button == "end":
                 start_screen()
 
-        
+
     pygame.display.update()
