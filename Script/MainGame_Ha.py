@@ -11,7 +11,7 @@ pygame.display.set_caption("Flappy Bird")
 icon = pygame.image.load('assets/yellowbird-midflap.png')
 pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
-game_font = pygame.font.Font('04B_19.TTF',35)
+
 # Hình nền màn hình bắt đầu
 start_bg = pygame.transform.scale2x(pygame.image.load('assets/background-night.png').convert())
 

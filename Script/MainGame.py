@@ -31,14 +31,14 @@ end_bg = pygame.image.load('assets/backgroundEmpty.png').convert()
 
 
 # Nút Start
-start_button = pygame.transform.scale(pygame.image.load('assets/startButton.png').convert_alpha(),(200,50))
-start_button_hover = pygame.transform.scale(pygame.image.load('assets/startColButton.png').convert_alpha(),(200,50))
-start_button_rect = start_button.get_rect(center=(216, 434))
+start_button = pygame.transform.scale(pygame.image.load('assets/options_button.png').convert_alpha(),(200,50))
+start_button_hover = pygame.transform.scale(pygame.image.load('assets/options_col_button.png').convert_alpha(),(200,50))
+start_button_rect = start_button.get_rect(center=(216, 384))
 
 # Nút Start2
-play_button = pygame.transform.scale(pygame.image.load('assets/playButton.png').convert_alpha(),(200,50))
-play_button_hover = pygame.transform.scale(pygame.image.load('assets/playColButton.png').convert_alpha(),(200,50))
-play_button_rect = play_button.get_rect(center=(216, 534))
+play_button = pygame.transform.scale(pygame.image.load('assets/options_button.png').convert_alpha(),(200,50))
+play_button_hover = pygame.transform.scale(pygame.image.load('assets/options_col_button.png').convert_alpha(),(200,50))
+play_button_rect = play_button.get_rect(center=(216, 484))
 
 # Nút New Game
 new_game_button = pygame.transform.scale(pygame.image.load('assets/newGameButton.png').convert_alpha(),(200,50))
@@ -149,6 +149,10 @@ hovered = False
 
 
 #Chèn âm thanh
+click_sound = pygame.mixer.Sound('sound/sfx_click_button.wav')
+hover_sound = pygame.mixer.Sound('sound/sfx_hover.wav')
+ui_background_music = pygame.mixer.Sound('sound/sfx_ui.wav')
+main_background_music = pygame.mixer.Sound('sound/sfx_maingame.wav')
 flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
 hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
 score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
@@ -194,6 +198,7 @@ while True:
         #UI
         if current_button_rect.collidepoint(pygame.mouse.get_pos()):
             hovered = True
+            hover_sound.play()
         else:
             hovered = False
         
@@ -202,6 +207,19 @@ while True:
                 current_button_image = start_button_hover
             else:
                 current_button_image = start_button
+
+        if current_button == "start":
+            if play_button_rect.collidepoint(pygame.mouse.get_pos()):
+                screen.blit(play_button_hover, play_button_rect)
+                hover_sound.play()
+            else:
+                screen.blit(play_button, play_button_rect)    
+
+        if play_button_rect.collidepoint(pygame.mouse.get_pos()):
+            if pygame.mouse.get_pressed()[0]:
+                end_screen()         #chuyển đến màn hình option 2 ở đây
+                hover_sound.stop()
+                click_sound.play()
         
         if current_button == "end" :
             if hovered:
@@ -212,6 +230,7 @@ while True:
         if current_button == "end":
             if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
                 screen.blit(quit_button_hover, quit_button_rect)
+                hover_sound.play()
             else:
                 screen.blit(quit_button, quit_button_rect)
         
@@ -223,6 +242,8 @@ while True:
         screen.blit(current_button_image, current_button_rect)
         
         if hovered and pygame.mouse.get_pressed()[0]:
+            hover_sound.stop()
+            click_sound.play()
             if current_button == "start":
                 bird_rect = bird.get_rect(center = (100,384))
                 bird_movement = 0
