@@ -61,10 +61,10 @@ class Level2(LevelCtl):
         self.pipe_manager.draw_pipes(screen, self.pipe_manager.pipes)
 
     def set_pile_in_screen(self):
-        self.pipe_manager.pipes = self.instance_pipe_right() if self.pipe_item == 0 else self.instance_pipe_left()
+        self.pipe_manager.pipes = self.instance_pipe_left() if self.pipe_item == 0 else self.instance_pipe_right()
         self.pipe_item = 1 if self.pipe_item == 0 else 0
 
-    def instance_pipe_left(self) -> []:
+    def instance_pipe_right(self) -> []:
         posY = [i * 100 for i in range(1, 10)]
         kq = []
         for i in range(5):
@@ -74,14 +74,15 @@ class Level2(LevelCtl):
             kq.append(new_pipe)
         return kq
 
-    def instance_pipe_right(self) -> []:
-        posX = [i * 100 for i in range(1, 10)]
+    def instance_pipe_left(self) -> []:
+        posY = [i * 100 for i in range(1, 10)]
         kq = []
         for i in range(5):
-            x = random.choice(posX)
-            posX.remove(x)
-            new_pipe = Pipe(-100, x, self.pipe_manager.pipe_image, -90)
-            new_pipe.x = -(new_pipe.height - 50)
-            new_pipe.pipe_rect.centerx = -(new_pipe.height - 50)
+            y = random.choice(posY)
+            posY.remove(y)
+            new_pipe = Pipe(-100, y, self.pipe_manager.pipe_image, -90)
+            x = new_pipe.x + (new_pipe.height - 50)
+            new_pipe.x -= x
+            new_pipe.pipe_rect.centerx -= x
             kq.append(new_pipe)
         return kq
