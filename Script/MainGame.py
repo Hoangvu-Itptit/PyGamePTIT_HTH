@@ -108,10 +108,19 @@ bird_rect = bird.get_rect(center = (100,384))
 birdflap = pygame.USEREVENT + 1
 pygame.time.set_timer(birdflap,200)
 
+#Chèn âm thanh
+click_sound = pygame.mixer.Sound('sound/sfx_click_button.wav')
+hover_sound = pygame.mixer.Sound('sound/sfx_hover.wav')
+ui_background_music = pygame.mixer.Sound('sound/sfx_ui.wav')
+main_background_music = pygame.mixer.Sound('sound/sfx_maingame.wav')
+flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
+hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
+score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
 
+    ui_background_music.play()
     
     global current_button
     current_button = "start"
@@ -126,6 +135,7 @@ def end_screen():
     screen.blit(end_bg, (0, 0))
     screen.blit(score,(100,150))
 
+    ui_background_music.play()
 
     global current_button
     current_button = "end"
@@ -148,14 +158,6 @@ start_screen()
 hovered = False
 
 
-#Chèn âm thanh
-click_sound = pygame.mixer.Sound('sound/sfx_click_button.wav')
-hover_sound = pygame.mixer.Sound('sound/sfx_hover.wav')
-ui_background_music = pygame.mixer.Sound('sound/sfx_ui.wav')
-main_background_music = pygame.mixer.Sound('sound/sfx_maingame.wav')
-flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
-hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
-score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
 
 # Vòng lặp xử lý game 
 while True:
