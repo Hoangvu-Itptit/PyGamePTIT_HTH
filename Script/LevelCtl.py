@@ -49,13 +49,7 @@ class Level1(LevelCtl):
 class Level2(LevelCtl):
     def __init__(self, pipe_manager):
         super().__init__(pipe_manager, False)
-        for i in range(5):
-            new_pipe = Pipe(-100, 100 + i * 200, pipe_manager.pipe_image, -90)
-            new_pipe.x = -(new_pipe.height - 50)
-            new_pipe.pipe_rect.centerx = -(new_pipe.height - 50)
-            self.pipe_manager.pipes.append(new_pipe)
-        self.pipe_item = 0
-        self.set_pile_in_screen()
+        self.pipe_item = 1
 
     def update(self, screen):
         self.pipe_manager.draw_pipes(screen, self.pipe_manager.pipes)
