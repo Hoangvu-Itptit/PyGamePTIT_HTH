@@ -80,7 +80,7 @@ class Level2(LevelCtl):
         for i in range(5):
             x = random.choice(posX)
             posX.remove(x)
-            new_pipe = Pipe(-100, 100 + i * 200, self.pipe_manager.pipe_image, -90)
+            new_pipe = Pipe(-100, x, self.pipe_manager.pipe_image, -90)
             new_pipe.x = -(new_pipe.height - 50)
             new_pipe.pipe_rect.centerx = -(new_pipe.height - 50)
             kq.append(new_pipe)
