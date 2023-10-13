@@ -41,6 +41,6 @@ class PipeManager:
     def remove_offscreen_pipes(self):
         self.pipes = [pipe for pipe in self.pipes if pipe.y < HEIGHT]
 
-    def draw_pipes(self, screen):
-        for pipe in self.pipes:
+    def draw_pipes(self, screen, list_pipe):
+        for pipe in list_pipe:
             pipe.draw(screen)
