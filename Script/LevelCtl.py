@@ -61,9 +61,8 @@ class Level2(LevelCtl):
         self.pipe_manager.draw_pipes(screen, self.pipe_manager.pipes)
 
     def set_pile_in_screen(self):
-        self.pipe_manager.pipes = self.instance_pipe_left() if self.pipe_item == 0 else self.instance_pipe_right()
+        self.pipe_manager.pipes = self.instance_pipe_right() if self.pipe_item == 0 else self.instance_pipe_left()
         self.pipe_item = 1 if self.pipe_item == 0 else 0
-        pass
 
     def instance_pipe_left(self) -> []:
         posY = [i * 100 for i in range(1, 10)]
