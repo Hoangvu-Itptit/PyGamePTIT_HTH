@@ -21,8 +21,7 @@ spawnPipeEvent = pygame.USEREVENT
 pygame.time.set_timer(spawnPipeEvent, 1200)
 
 # Hình nền màn hình bắt đầu
-start_bg = pygame.transform.scale2x(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/background-night.png')).convert())
+start_bg = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/backgroundCastles.png')).convert()
 
 clock = pygame.time.Clock()
 game_font = pygame.font.Font(os.path.join(CONST.GAME_PATH, '04B_19.TTF'), 50)
@@ -38,6 +37,8 @@ def score_display(game_state):
         score_rect = score_surface.get_rect(center=(216, 100))
         screen.blit(score_surface, score_rect)
     if game_state == 'game_over':
+        if score < 0:
+            score = 0
         score_surface = game_font.render(f'Score: {int(score)}', True, (205, 133, 63))
         score_rect = score_surface.get_rect(center=(220, 177))
         screen.blit(score_surface, score_rect)
@@ -57,12 +58,9 @@ WHITE = (255, 255, 255)
 RED = (255, 90, 0)
 
 # Nút Start
-mode1_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
-mode1_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
+mode1_button_surface = pygame.transform.scale(pygame.image.load('assets/ButtonClassic.png').convert_alpha(),(200,50))
+mode1_button_hover = pygame.transform.scale(pygame.image.load('assets/ButtonClassic2.png').convert_alpha(),(200,50))
 mode1_button_rect = mode1_button_surface.get_rect(center=(216, 384))
-mode1_text = font.render("Classic Mode", True, RED)
-mode1_text_hover = font.render("Classic Mode", True, WHITE)
-mode1_text_rect = mode1_text.get_rect(center=(216, 384))
 # Nút Start2
 mode2_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
 mode2_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
@@ -154,7 +152,6 @@ def check_collision(pipes):
             return True
     for pipe in pipes:
         if bird_rect.colliderect(pipe.pipe_rect):
-            print("Hit")
             return True
     return False
 
@@ -184,8 +181,6 @@ def start_screen():
     global current_button_image
     current_button_image = mode1_button_surface
 
-    global current_mode1_text
-    current_mode1_text = mode1_text
 
 def end_screen():
     screen.blit(end_bg, (0, 0))
@@ -252,7 +247,7 @@ while True:
             screen.blit(rotated_bird, bird_rect)
             game_over = check_collision(level.pipe_manager.pipes)
             bird_rect.centerx -= direction
-            score += 0.02
+            score += 0.028
             score_display('main game')
         else:
             bird_movement += gravity
@@ -272,14 +267,16 @@ while True:
             hovered = False
         
         if current_button == "start" :
+            
+            
             if hovered:
-                current_mode1_text = mode1_text_hover
                 current_button_image = mode1_button_hover
+                
             else:
                 current_button_image = mode1_button_surface
-                current_mode1_text = mode1_text
                 
-
+        
+        
         if current_button == "start":
             if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
                 current_mode2_text = mode2_text_hover
@@ -290,6 +287,7 @@ while True:
                 current_mode2_text = mode2_text
                 screen.blit(mode2_button_surface, mode2_button_rect)
                 screen.blit(mode2_text, mode2_text_rect)
+                
         if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
             if pygame.mouse.get_pressed()[0]:
                 current_level = 2
@@ -332,12 +330,12 @@ while True:
                 game_over = False
                 level.pipe_manager.pipes = []
                 level = FactoryLevel.create_level(1, pipe_manager, 5)
-                score = -1.5
+                score = -2.8
                 
             elif current_button == "end":
                 start_screen()
 
-        screen.blit(current_mode1_text, mode1_text_rect)
+        #screen.blit(current_mode1_text, mode1_text_rect)
         # UI
         # if current_button_rect.collidepoint(pygame.mouse.get_pos()):
         #     hovered = True
