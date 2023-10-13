@@ -54,8 +54,8 @@ class Level2(LevelCtl):
             new_pipe.x = -(new_pipe.height - 50)
             new_pipe.pipe_rect.centerx = -(new_pipe.height - 50)
             self.pipe_manager.pipes.append(new_pipe)
-        self.set_pile_in_screen()
         self.pipe_item = 0
+        self.set_pile_in_screen()
 
     def update(self, screen):
         self.pipe_manager.draw_pipes(screen, self.pipe_manager.pipes)
