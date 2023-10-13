@@ -73,7 +73,7 @@ level = FactoryLevel.create_level(1, pipe_manager, 5)
 
 #Tạo các biến cho trò chơi
 game_over = True
-gravity = 0.25
+gravity = 0.35
 bird_movement = 0
 score = 0
 high_score = 0
@@ -129,8 +129,12 @@ def check_collision(pipes):
                 level.set_pile_in_screen()
             else:
                 return True
-    if bird_rect.top <= -75 or bird_rect.bottom >= 650:
-            return True    
+    if current_level == 1:
+        if bird_rect.top <= -75 or bird_rect.bottom >= 650 :
+                return True  
+    elif current_level == 2:
+        if bird_rect.top <= -85 or bird_rect.bottom >= 750 :
+            return True  
     for pipe in pipes:
         if bird_rect.colliderect(pipe.pipe_rect):
             print("Hit")
@@ -199,7 +203,8 @@ while True:
     
     
         if event.type == spawnPipeEvent:
-            pipe_manager.add_pipe()
+            if level.is_create_new_pipe:
+                pipe_manager.add_pipe()
             
             
         if event.type == pygame.KEYDOWN:
@@ -289,6 +294,7 @@ while True:
                     bird_rect = bird.get_rect(center = (100,384))
                     bird_movement = 0
                     game_over = False
+                    direction = 3
                     level.pipe_manager.pipes = []
                     level = FactoryLevel.create_level(2, pipe_manager, 5)
                     score = -1.5
