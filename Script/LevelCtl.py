@@ -1,5 +1,3 @@
-import pygame
-
 import CONST
 from WaterPipe import Pipe
 
@@ -56,6 +54,7 @@ class Level2(LevelCtl):
         for i in range(5):
             new_pipe = Pipe(-100, 100 + i * 200, pipe_manager.pipe_image, -90)
             new_pipe.x = -(new_pipe.height - 50)
+            new_pipe.pipe_rect.centerx = -(new_pipe.height - 50)
             self.pipe_manager.pipes.append(new_pipe)
 
         self.pipe_item = 0
