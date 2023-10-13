@@ -40,6 +40,7 @@ class Level1(LevelCtl):
     def move_pile(self, pipe: Pipe):
         pipe.y += self.pipeSpeed
         pipe.rect.x = pipe.x
+        pipe.pipe_rect.centery += self.pipeSpeed
 
 
 class Level2(LevelCtl):

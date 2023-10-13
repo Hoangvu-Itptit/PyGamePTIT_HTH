@@ -11,6 +11,7 @@ class Pipe:
         self.image = pygame.transform.rotate(self.image, angle)
         self.width = image.get_width()
         self.height = image.get_height()
+        self.pipe_rect = self.image.get_rect(topleft = (self.x,self.y))
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen):

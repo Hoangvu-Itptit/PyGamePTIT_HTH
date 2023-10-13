@@ -6,7 +6,6 @@ from WaterPipe import Pipe, PipeManager
 import os
 
 # Khởi tạo Pygame
-pygame.mixer.pre_init(frequency=44100,size=-16,channels=2,buffer=512)
 pygame.init()
 
 # Cửa sổ game
@@ -25,20 +24,35 @@ pygame.time.set_timer(spawnPipeEvent, 1200)
 start_bg = pygame.transform.scale2x(pygame.image.load('assets/background-night.png').convert())
 
 clock = pygame.time.Clock()
+game_font = pygame.font.Font('04B_19.TTF',50)
+
+# Hiện điểm
+def score_display(game_state):
+    global high_score
+    global score
+    if game_state == 'main game':
+        score_surface = game_font.render(str(int(score if score >=0 else 0)),True,(255,255,255))
+        score_rect = score_surface.get_rect(center = (216,100))
+        screen.blit(score_surface,score_rect)
+    if game_state == 'game_over':
+        score_surface = game_font.render(f'Score: {int(score)}',True,(205,133,63))
+        score_rect = score_surface.get_rect(center = (220,177))
+        screen.blit(score_surface,score_rect)
+
+        if high_score < score:
+            high_score = score
+        high_score_surface = game_font.render(f'High Score: {int(high_score)}',True,(205,133,63))
+        high_score_rect = high_score_surface.get_rect(center = (216,330))
+        screen.blit(high_score_surface,high_score_rect)
+
 
 # Hình nền màn hình kết thúc
 end_bg = pygame.image.load('assets/backgroundEmpty.png').convert()
 
-
 # Nút Start
-start_button = pygame.transform.scale(pygame.image.load('assets/options_button.png').convert_alpha(),(200,50))
-start_button_hover = pygame.transform.scale(pygame.image.load('assets/options_col_button.png').convert_alpha(),(200,50))
+start_button = pygame.transform.scale(pygame.image.load('assets/startButton.png').convert_alpha(),(200,50))
+start_button_hover = pygame.transform.scale(pygame.image.load('assets/startColButton.png').convert_alpha(),(200,50))
 start_button_rect = start_button.get_rect(center=(216, 384))
-
-# Nút Start2
-play_button = pygame.transform.scale(pygame.image.load('assets/options_button.png').convert_alpha(),(200,50))
-play_button_hover = pygame.transform.scale(pygame.image.load('assets/options_col_button.png').convert_alpha(),(200,50))
-play_button_rect = play_button.get_rect(center=(216, 484))
 
 # Nút New Game
 new_game_button = pygame.transform.scale(pygame.image.load('assets/newGameButton.png').convert_alpha(),(200,50))
@@ -50,7 +64,6 @@ quit_button = pygame.transform.scale(pygame.image.load('assets/quit_button.png')
 quit_button_hover = pygame.transform.scale(pygame.image.load('assets/quit_col_button.png').convert_alpha(),(200,50))
 quit_button_rect = quit_button.get_rect(center=(216, 534))
 
-score = pygame.transform.scale(pygame.image.load('assets/text_score.png').convert_alpha(),(150,50))
 
 # Creat Level
 level = FactoryLevel.create_level(1, pipe_manager, 5)
@@ -60,18 +73,27 @@ level = FactoryLevel.create_level(1, pipe_manager, 5)
 def move_bird(bird):
     bird.centerx += direction
     return bird
-def check_collision():
+
+def flip_bird():
     global direction
-    # for pipe in pipes:
-    #     if bird_rect.colliderect(pipe):
-    #         hit_sound.play()
-    #         return False
+    direction *= -1 
+
+def check_collision(pipes):
+    global direction
+    global current_level
     if bird_rect.left <= 0 or bird_rect.right >= 432:
-            direction *= -1
+            if current_level == 2:
+                flip_bird()
+            else:
+                return True
     if bird_rect.top <= -75 or bird_rect.bottom >= 650:
             return True    
+    for pipe in pipes:
+        if bird_rect.colliderect(pipe.pipe_rect):
+            print("Hit")
+            return True
     return False 
-
+ 
 
 def rotate_bird(bird1):
 	new_bird = pygame.transform.rotozoom(bird1,-bird_movement*3,1)
@@ -92,6 +114,7 @@ score = 0
 high_score = 0
 direction = 3
 floor_x_pos = 0
+current_level = 1
 
 #tạo chim
 bird_down = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-downflap.png').convert_alpha())
@@ -108,19 +131,11 @@ bird_rect = bird.get_rect(center = (100,384))
 birdflap = pygame.USEREVENT + 1
 pygame.time.set_timer(birdflap,200)
 
-#Chèn âm thanh
-click_sound = pygame.mixer.Sound('sound/sfx_click_button.wav')
-hover_sound = pygame.mixer.Sound('sound/sfx_hover.wav')
-ui_background_music = pygame.mixer.Sound('sound/sfx_ui.wav')
-main_background_music = pygame.mixer.Sound('sound/sfx_maingame.wav')
-flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
-hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
-score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
+    
 
-    ui_background_music.play()
     
     global current_button
     current_button = "start"
@@ -133,9 +148,8 @@ def start_screen():
 
 def end_screen():
     screen.blit(end_bg, (0, 0))
-    screen.blit(score,(100,150))
+    score_display("game_over")
 
-    ui_background_music.play()
 
     global current_button
     current_button = "end"
@@ -158,6 +172,10 @@ start_screen()
 hovered = False
 
 
+#Chèn âm thanh
+flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
+hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
+score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
 
 # Vòng lặp xử lý game 
 while True:
@@ -167,6 +185,7 @@ while True:
             sys.exit()
         
     
+    
         if event.type == spawnPipeEvent:
             pipe_manager.add_pipe()
             
@@ -174,7 +193,10 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and game_over == False:
                 bird_movement = 0
-                bird_movement =-7
+                if current_level == 1:
+                    flip_bird() 
+                else:
+                    bird_movement =-7
                 flap_sound.play()
         
         if event.type == birdflap:
@@ -190,40 +212,39 @@ while True:
         level.update(screen)
         
         #chim
-        bird_movement += gravity
-        rotated_bird = rotate_bird(bird)       
-        bird_rect.centery += bird_movement
-        screen.blit(rotated_bird,bird_rect)
-        game_over= check_collision()
-        bird_rect.centerx -= direction
+        if current_level == 1:
+            #bird_movement += gravity
+            rotated_bird = rotate_bird(bird)       
+            bird_rect.centery += bird_movement
+            screen.blit(rotated_bird,bird_rect)
+            game_over= check_collision(level.pipe_manager.pipes)
+            bird_rect.centerx -= direction
+            score += 0.02
+            score_display('main game')
+        else:
+            bird_movement += gravity
+            rotated_bird = rotate_bird(bird)       
+            bird_rect.centery += bird_movement
+            screen.blit(rotated_bird,bird_rect)
+            game_over= check_collision(level.pipe_manager.pipes)
+            bird_rect.centerx -= direction
+            score += 0.01
+        if (game_over == True):
+            end_screen()
     else:
         #UI
         if current_button_rect.collidepoint(pygame.mouse.get_pos()):
             hovered = True
-            hover_sound.play()
         else:
             hovered = False
         
-        if current_button == "start" :
+        if current_button == "start":
             if hovered:
                 current_button_image = start_button_hover
             else:
                 current_button_image = start_button
-
-        if current_button == "start":
-            if play_button_rect.collidepoint(pygame.mouse.get_pos()):
-                screen.blit(play_button_hover, play_button_rect)
-                hover_sound.play()
-            else:
-                screen.blit(play_button, play_button_rect)    
-
-        if play_button_rect.collidepoint(pygame.mouse.get_pos()):
-            if pygame.mouse.get_pressed()[0]:
-                end_screen()         #chuyển đến màn hình option 2 ở đây
-                hover_sound.stop()
-                click_sound.play()
         
-        if current_button == "end" :
+        if current_button == "end":
             if hovered:
                 current_button_image = new_game_button_hover
             else:
@@ -232,7 +253,6 @@ while True:
         if current_button == "end":
             if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
                 screen.blit(quit_button_hover, quit_button_rect)
-                hover_sound.play()
             else:
                 screen.blit(quit_button, quit_button_rect)
         
@@ -244,16 +264,25 @@ while True:
         screen.blit(current_button_image, current_button_rect)
         
         if hovered and pygame.mouse.get_pressed()[0]:
-            hover_sound.stop()
-            click_sound.play()
             if current_button == "start":
-                bird_rect = bird.get_rect(center = (100,384))
-                bird_movement = 0
-                game_over = False
+                if current_level == 1:
+                    bird_rect = bird.get_rect(center = (216,484))
+                    bird_movement = 0
+                    game_over = False
+                    level.pipe_manager.pipes = []
+                    level = FactoryLevel.create_level(1, pipe_manager, 5)
+                    score = -1.5
+                else:
+                    bird_rect = bird.get_rect(center = (100,384))
+                    bird_movement = 0
+                    game_over = False
+                    level.pipe_manager.pipes = []
+                    level = FactoryLevel.create_level(2, pipe_manager, 5)
+               
                 
             elif current_button == "end":
                 start_screen()
 
-
+        
     pygame.display.update()
     clock.tick(60)
