@@ -26,6 +26,7 @@ start_bg = pygame.transform.scale2x(
 
 clock = pygame.time.Clock()
 game_font = pygame.font.Font(os.path.join(CONST.GAME_PATH, '04B_19.TTF'), 50)
+font = pygame.font.Font(None, 36)
 
 
 # Hiện điểm
@@ -51,27 +52,33 @@ def score_display(game_state):
 # Hình nền màn hình kết thúc
 end_bg = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/backgroundEmpty.png')).convert()
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 90, 0)
+
 # Nút Start
-start_button = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/startButton.png')).convert_alpha(), (200, 50))
-start_button_hover = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/startColButton.png')).convert_alpha(), (200, 50))
-start_button_rect = start_button.get_rect(center=(216, 384))
+mode1_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
+mode1_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
+mode1_button_rect = mode1_button_surface.get_rect(center=(216, 384))
+mode1_text = font.render("Classic Mode", True, RED)
+mode1_text_hover = font.render("Classic Mode", True, WHITE)
+mode1_text_rect = mode1_text.get_rect(center=(216, 384))
+# Nút Start2
+mode2_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
+mode2_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
+mode2_button_rect = mode2_button_surface.get_rect(center=(216, 484))
+mode2_text = font.render("Special Mode", True, RED)
+mode2_text_hover = font.render("Special Mode", True, WHITE)
+mode2_text_rect = mode2_text.get_rect(center=(216, 484))
+# Nút Quit
+quit_button_surface = pygame.transform.scale(pygame.image.load('assets/quit_button.png').convert_alpha(),(200,50))
+quit_button_hover = pygame.transform.scale(pygame.image.load('assets/quit_col_button.png').convert_alpha(),(200,50))
+quit_button_rect = quit_button_surface.get_rect(center=(216, 534))
 
 # Nút New Game
-new_game_button = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/newGameButton.png')).convert_alpha(), (200, 50))
-new_game_button_hover = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/newGameColButton.png')).convert_alpha(),
-    (200, 50))
-new_game_button_rect = new_game_button.get_rect(center=(216, 434))
-
-# Nút Quit
-quit_button = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/quit_button.png')).convert_alpha(), (200, 50))
-quit_button_hover = pygame.transform.scale(
-    pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/quit_col_button.png')).convert_alpha(), (200, 50))
-quit_button_rect = quit_button.get_rect(center=(216, 534))
+new_game_button_surface = pygame.transform.scale(pygame.image.load('assets/newGameButton.png').convert_alpha(),(200,50))
+new_game_button_hover = pygame.transform.scale(pygame.image.load('assets/newGameColButton.png').convert_alpha(),(200,50))
+new_game_button_rect = new_game_button_surface.get_rect(center=(216, 434))
 
 # Creat Level
 level = FactoryLevel.create_level(1, pipe_manager, 5)
@@ -131,11 +138,13 @@ def flip_bird():
 def check_collision(pipes):
     global direction
     global current_level
+    global score
     if bird_rect.left <= 0 or bird_rect.right >= 432:
         if current_level == 2:
+            score += 1
             flip_bird()
             level.set_pile_in_screen()
-        else:
+        else:  
             return True
     if current_level == 1:
         if bird_rect.top <= -75 or bird_rect.bottom >= 650:
@@ -165,16 +174,18 @@ def bird_animation(bird):
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
-
+    
     global current_button
     current_button = "start"
-
+    
     global current_button_rect
-    current_button_rect = start_button_rect
-
+    current_button_rect = mode1_button_rect
+    
     global current_button_image
-    current_button_image = start_button
+    current_button_image = mode1_button_surface
 
+    global current_mode1_text
+    current_mode1_text = mode1_text
 
 def end_screen():
     screen.blit(end_bg, (0, 0))
@@ -182,17 +193,17 @@ def end_screen():
 
     global current_button
     current_button = "end"
-
+    
     global current_button_rect
     current_button_rect = new_game_button_rect
-
+    
     global current_button_image
-    current_button_image = new_game_button
+    current_button_image = new_game_button_surface
 
     if hovered and current_button == "quit":
-        quit_button_image = quit_button_hover
+        quit_button_image = quit_button_hover 
     else:
-        quit_button_image = quit_button
+        quit_button_image = quit_button_surface
     screen.blit(quit_button_image, quit_button_rect)
 
 
@@ -250,62 +261,155 @@ while True:
             screen.blit(rotated_bird, bird_rect)
             game_over = check_collision(level.pipe_manager.pipes)
             bird_rect.centerx -= direction
-            score += 0.01
+            score_display('main game')
         if (game_over == True):
             end_screen()
     else:
-        # UI
         if current_button_rect.collidepoint(pygame.mouse.get_pos()):
             hovered = True
+            hover_sound.play()
         else:
             hovered = False
+        
+        if current_button == "start" :
+            if hovered:
+                current_mode1_text = mode1_text_hover
+                current_button_image = mode1_button_hover
+            else:
+                current_button_image = mode1_button_surface
+                current_mode1_text = mode1_text
+                
 
         if current_button == "start":
-            if hovered:
-                current_button_image = start_button_hover
+            if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
+                current_mode2_text = mode2_text_hover
+                screen.blit(mode2_button_hover, mode2_button_rect)
+                screen.blit(mode2_text_hover, mode2_text_rect)
+                hover_sound.play()
             else:
-                current_button_image = start_button
-
-        if current_button == "end":
+                current_mode2_text = mode2_text
+                screen.blit(mode2_button_surface, mode2_button_rect)
+                screen.blit(mode2_text, mode2_text_rect)
+        if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
+            if pygame.mouse.get_pressed()[0]:
+                current_level = 2
+                bird_rect = bird.get_rect(center=(100, 384))
+                bird_movement = 0
+                game_over = False
+                direction = 3
+                level.pipe_manager.pipes = []
+                level = FactoryLevel.create_level(2, pipe_manager, 5)
+                score = 0        #chuyển đến màn hình option 2 ở đây
+                hover_sound.stop()
+                click_sound.play()
+        if current_button == "end" :
             if hovered:
                 current_button_image = new_game_button_hover
             else:
-                current_button_image = new_game_button
+                current_button_image = new_game_button_surface
 
         if current_button == "end":
             if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
                 screen.blit(quit_button_hover, quit_button_rect)
+                hover_sound.play()
             else:
-                screen.blit(quit_button, quit_button_rect)
-
+                screen.blit(quit_button_surface, quit_button_rect)
+        
         if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
             if pygame.mouse.get_pressed()[0]:
                 pygame.quit()
                 sys.exit()
 
         screen.blit(current_button_image, current_button_rect)
-
+        
         if hovered and pygame.mouse.get_pressed()[0]:
+            hover_sound.stop()
+            click_sound.play()
             if current_button == "start":
-                if current_level == 1:
-                    bird_rect = bird.get_rect(center=(216, 484))
-                    bird_movement = 0
-                    game_over = False
-                    level.pipe_manager.pipes = []
-                    level = FactoryLevel.create_level(1, pipe_manager, 5)
-                    score = -1.5
-                else:
-                    bird_rect = bird.get_rect(center=(100, 384))
-                    bird_movement = 0
-                    game_over = False
-                    direction = 3
-                    level.pipe_manager.pipes = []
-                    level = FactoryLevel.create_level(2, pipe_manager, 5)
-                    score = -1.5
-
-
+                current_level = 1
+                bird_rect = bird.get_rect(center=(216, 484))
+                bird_movement = 0
+                game_over = False
+                level.pipe_manager.pipes = []
+                level = FactoryLevel.create_level(1, pipe_manager, 5)
+                score = -1.5
+                
             elif current_button == "end":
                 start_screen()
 
+        screen.blit(current_mode1_text, mode1_text_rect)
+        # UI
+        # if current_button_rect.collidepoint(pygame.mouse.get_pos()):
+        #     hovered = True
+        # else:
+        #     hovered = False
+
+        # if current_button == "start" :
+        #     if hovered:
+        #         current_mode1_text = mode1_text_hover
+        #         current_button_image = mode1_button_hover
+        #     else:
+        #         current_button_image = mode1_button_surface
+        #         current_mode1_text = mode1_text
+                
+
+        # if current_button == "start":
+        #     if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
+        #         current_mode2_text = mode2_text_hover
+        #         screen.blit(mode2_button_hover, mode2_button_rect)
+        #         screen.blit(mode2_text_hover, mode2_text_rect)
+        #         hover_sound.play()
+        #     else:
+        #         current_mode2_text = mode2_text
+        #         screen.blit(mode2_button_surface, mode2_button_rect)
+        #         screen.blit(mode2_text, mode2_text_rect)
+
+        # if current_button == "end":
+        #     if hovered:
+        #         current_button_image = new_game_button_hover
+        #     else:
+        #         current_button_image = new_game_button
+
+        # if current_button == "end":
+        #     if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
+        #         screen.blit(quit_button_hover, quit_button_rect)
+        #     else:
+        #         screen.blit(quit_button, quit_button_rect)
+
+        # if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
+        #     if pygame.mouse.get_pressed()[0]:
+        #         pygame.quit()
+        #         sys.exit()
+
+        # screen.blit(current_button_image, current_button_rect)
+
+        # if hovered and pygame.mouse.get_pressed()[0]:
+        #     if current_button == "start":
+        #         current_level = 1
+        #         bird_rect = bird.get_rect(center=(216, 484))
+        #         bird_movement = 0
+        #         game_over = False
+        #         level.pipe_manager.pipes = []
+        #         level = FactoryLevel.create_level(1, pipe_manager, 5)
+        #         score = -1.5
+        #     elif current_button == "end":
+        #         start_screen()
+
+
+                
+        # if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
+        #     if pygame.mouse.get_pressed()[0]:   
+        #         current_level = 2
+        #         bird_rect = bird.get_rect(center=(100, 384))
+        #         bird_movement = 0
+        #         game_over = False
+        #         direction = 3
+        #         level.pipe_manager.pipes = []
+        #         level = FactoryLevel.create_level(2, pipe_manager, 5)
+        #         score = 0
+            
+
+            
+        # screen.blit(current_mode1_text, mode1_text_rect)
     pygame.display.update()
     clock.tick(60)
