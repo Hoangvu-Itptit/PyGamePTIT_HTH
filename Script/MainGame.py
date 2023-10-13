@@ -69,6 +69,48 @@ quit_button_rect = quit_button.get_rect(center=(216, 534))
 level = FactoryLevel.create_level(1, pipe_manager, 5)
 
 
+
+
+#Tạo các biến cho trò chơi
+game_over = True
+gravity = 0.25
+bird_movement = 0
+score = 0
+high_score = 0
+direction = 3
+floor_x_pos = 0
+current_level = 2
+
+#tạo chim
+bird_down = pygame.transform.scale(pygame.image.load('assets/planeRed1.png').convert_alpha(),(80,50))
+bird_mid = pygame.transform.scale(pygame.image.load('assets/planeRed2.png').convert_alpha(),(80,50))
+bird_up = pygame.transform.scale(pygame.image.load('assets/planeRed3.png').convert_alpha(),(80,50))
+bird_list= [bird_down,bird_mid,bird_up] #0 1 2
+bird_index = 0
+bird = bird_list[bird_index]
+#bird= pygame.image.load('assets/yellowbird-midflap.png').convert_alpha()
+#bird = pygame.transform.scale2x(bird)
+bird_rect = bird.get_rect(center = (100,384))
+
+#tạo timer cho bird
+birdflap = pygame.USEREVENT + 1
+pygame.time.set_timer(birdflap,200)
+
+
+# Trạng thái hover của nút
+hovered = False
+
+
+#Âm thanh
+click_sound = pygame.mixer.Sound('sound/sfx_click_button.wav')
+hover_sound = pygame.mixer.Sound('sound/sfx_hover.wav')
+ui_background_music = pygame.mixer.Sound('sound/sfx_ui.wav')
+main_background_music = pygame.mixer.Sound('sound/sfx_maingame.wav')
+flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
+hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
+score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
+
+
 #Bird
 def move_bird(bird):
     bird.centerx += direction
@@ -84,6 +126,7 @@ def check_collision(pipes):
     if bird_rect.left <= 0 or bird_rect.right >= 432:
             if current_level == 2:
                 flip_bird()
+                level.set_pile_in_screen()
             else:
                 return True
     if bird_rect.top <= -75 or bird_rect.bottom >= 650:
@@ -106,36 +149,10 @@ def bird_animation(bird):
     return new_bird, new_bird_rect
 
 
-#Tạo các biến cho trò chơi
-game_over = True
-gravity = 0.25
-bird_movement = 0
-score = 0
-high_score = 0
-direction = 3
-floor_x_pos = 0
-current_level = 1
-
-#tạo chim
-bird_down = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-downflap.png').convert_alpha())
-bird_mid = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-midflap.png').convert_alpha())
-bird_up = pygame.transform.scale2x(pygame.image.load('assets/yellowbird-upflap.png').convert_alpha())
-bird_list= [bird_down,bird_mid,bird_up] #0 1 2
-bird_index = 0
-bird = bird_list[bird_index]
-#bird= pygame.image.load('assets/yellowbird-midflap.png').convert_alpha()
-#bird = pygame.transform.scale2x(bird)
-bird_rect = bird.get_rect(center = (100,384))
-
-#tạo timer cho bird
-birdflap = pygame.USEREVENT + 1
-pygame.time.set_timer(birdflap,200)
-
 
 def start_screen():
     screen.blit(start_bg, (0, 0))
     
-
     
     global current_button
     current_button = "start"
@@ -168,14 +185,9 @@ def end_screen():
 
 start_screen()
 
-# Trạng thái hover của nút
-hovered = False
+main_background_music.stop()
+ui_background_music.play()
 
-
-#Chèn âm thanh
-flap_sound = pygame.mixer.Sound('sound/sfx_wing.wav')
-hit_sound = pygame.mixer.Sound('sound/sfx_hit.wav')
-score_sound = pygame.mixer.Sound('sound/sfx_point.wav')
 
 # Vòng lặp xử lý game 
 while True:
@@ -193,6 +205,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and game_over == False:
                 bird_movement = 0
+                flap_sound.play()
                 if current_level == 1:
                     flip_bird() 
                 else:
@@ -278,6 +291,7 @@ while True:
                     game_over = False
                     level.pipe_manager.pipes = []
                     level = FactoryLevel.create_level(2, pipe_manager, 5)
+                    score = -1.5
                
                 
             elif current_button == "end":
