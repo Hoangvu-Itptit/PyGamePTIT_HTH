@@ -58,9 +58,12 @@ WHITE = (255, 255, 255)
 RED = (255, 90, 0)
 
 # Nút Start
-mode1_button_surface = pygame.transform.scale(pygame.image.load('assets/ButtonClassic.png').convert_alpha(),(200,50))
-mode1_button_hover = pygame.transform.scale(pygame.image.load('assets/ButtonClassic2.png').convert_alpha(),(200,50))
+mode1_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
+mode1_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
 mode1_button_rect = mode1_button_surface.get_rect(center=(216, 384))
+mode1_text = font.render("Classic Mode", True, RED)
+mode1_text_hover = font.render("Classic Mode", True, WHITE)
+mode1_text_rect = mode1_text.get_rect(center=(216, 384))
 # Nút Start2
 mode2_button_surface = pygame.transform.scale(pygame.image.load('assets/grey_button01.png').convert_alpha(),(200,50))
 mode2_button_hover = pygame.transform.scale(pygame.image.load('assets/red_button01.png').convert_alpha(),(200,50))
@@ -181,6 +184,9 @@ def start_screen():
     global current_button_image
     current_button_image = mode1_button_surface
 
+    global current_mode1_text
+    current_mode1_text = mode1_text
+
 
 def end_screen():
     screen.blit(end_bg, (0, 0))
@@ -265,26 +271,23 @@ while True:
             hover_sound.play()
         else:
             hovered = False
-        
+        screen.blit(current_button_image, current_button_rect)
         if current_button == "start" :
-            
             
             if hovered:
                 current_button_image = mode1_button_hover
-                
+                current_mode1_text = mode1_text_hover
             else:
                 current_button_image = mode1_button_surface
-                
-        
+                current_mode1_text = mode1_text
+            screen.blit(current_mode1_text, mode1_text_rect)
         
         if current_button == "start":
             if mode2_button_rect.collidepoint(pygame.mouse.get_pos()):
-                current_mode2_text = mode2_text_hover
                 screen.blit(mode2_button_hover, mode2_button_rect)
                 screen.blit(mode2_text_hover, mode2_text_rect)
                 hover_sound.play()
             else:
-                current_mode2_text = mode2_text
                 screen.blit(mode2_button_surface, mode2_button_rect)
                 screen.blit(mode2_text, mode2_text_rect)
                 
@@ -317,8 +320,6 @@ while True:
             if pygame.mouse.get_pressed()[0]:
                 pygame.quit()
                 sys.exit()
-
-        screen.blit(current_button_image, current_button_rect)
         
         if hovered and pygame.mouse.get_pressed()[0]:
             hover_sound.stop()
