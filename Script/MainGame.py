@@ -15,7 +15,7 @@ icon = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/yellowbird-midfla
 pygame.display.set_icon(icon)
 
 # Water pipe setup
-pipe_surface = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/pipe-green.png')).convert()
+pipe_surface = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/cot2.png')).convert()
 pipe_manager = PipeManager(pipe_surface)
 spawnPipeEvent = pygame.USEREVENT
 pygame.time.set_timer(spawnPipeEvent, 1200)
@@ -30,7 +30,8 @@ font = pygame.font.Font(None, 36)
 
 # Hiện điểm
 def score_display(game_state):
-    global high_score
+    global high_score_level1
+    global high_score_level2
     global score
     if game_state == 'main game':
         score_surface = game_font.render(str(int(score if score >= 0 else 0)), True, (255, 255, 255))
@@ -43,11 +44,18 @@ def score_display(game_state):
         score_rect = score_surface.get_rect(center=(220, 177))
         screen.blit(score_surface, score_rect)
 
-        if high_score < score:
-            high_score = score
-        high_score_surface = game_font.render(f'High Score: {int(high_score)}', True, (205, 133, 63))
-        high_score_rect = high_score_surface.get_rect(center=(216, 330))
-        screen.blit(high_score_surface, high_score_rect)
+        if current_level == 1:
+            if high_score_level1 < score:
+                high_score_level1 = score
+            high_score_surface = game_font.render(f'High Score: {int(high_score_level1)}', True, (205, 133, 63))
+            high_score_rect = high_score_surface.get_rect(center=(216, 330))
+            screen.blit(high_score_surface, high_score_rect)
+        else:
+            if high_score_level2 < score:
+                high_score_level2 = score
+            high_score_surface = game_font.render(f'High Score: {int(high_score_level2)}', True, (205, 133, 63))
+            high_score_rect = high_score_surface.get_rect(center=(216, 330))
+            screen.blit(high_score_surface, high_score_rect)
 
 
 # Hình nền màn hình kết thúc
@@ -89,7 +97,8 @@ game_over = True
 gravity = 0.35
 bird_movement = 0
 score = 0
-high_score = 0
+high_score_level1 = 0
+high_score_level2 = 0
 direction = 3
 floor_x_pos = 0
 current_level = 2
