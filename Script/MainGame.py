@@ -10,8 +10,8 @@ pygame.init()
 
 # Cửa sổ game
 screen = pygame.display.set_mode((432, 768))
-pygame.display.set_caption("Flappy Bird")
-icon = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/yellowbird-midflap.png'))
+pygame.display.set_caption("Flappy Plane")
+icon = pygame.image.load(os.path.join(CONST.GAME_PATH, 'assets/planeRed2.png'))
 pygame.display.set_icon(icon)
 
 # Water pipe setup
