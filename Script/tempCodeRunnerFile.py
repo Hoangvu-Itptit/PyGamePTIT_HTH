@@ -1,1 +1,0 @@
-screen.blit(current_mode1_text, mode1_text_rect)
